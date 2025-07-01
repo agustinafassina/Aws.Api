@@ -47,5 +47,11 @@ namespace AwsApi.Controllers
 
             return Ok(result);
         }
+
+        [HttpGet("version")]
+        public async Task<IActionResult> GetVersion()
+        {
+            return Ok("v.1.0.0");
+        }
     }
 }
