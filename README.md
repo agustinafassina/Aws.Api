@@ -5,10 +5,11 @@ Currently, the API retrieves information about EC2 instances and is in the proce
 
 ### Structure
 └─ .gitignore <br>
+└─ ./Services <br>
+└─ ./Controllers <br>
 └─ README.md <br>
 
 ### How to use this repository?
-
 
 <br>
 From root:
