@@ -1,6 +1,7 @@
 using AwsApi.Services;
 using Amazon.EC2;
 using Amazon.RDS;
+using AwsApi.Services.interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 

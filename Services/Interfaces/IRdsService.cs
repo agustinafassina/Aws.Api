@@ -1,6 +1,6 @@
 using Amazon.RDS.Model;
 
-namespace AwsApi.Services
+namespace AwsApi.Services.interfaces
 {
     public interface IRdsService
     {

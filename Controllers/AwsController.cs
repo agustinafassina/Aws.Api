@@ -1,4 +1,4 @@
-using AwsApi.Services;
+using AwsApi.Services.interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AwsApi.Controllers

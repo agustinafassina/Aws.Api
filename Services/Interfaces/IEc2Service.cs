@@ -1,4 +1,4 @@
-namespace AwsApi.Services
+namespace AwsApi.Services.interfaces
 {
     public interface IEc2Service
     {
