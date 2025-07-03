@@ -1,3 +1,5 @@
+using AutoMapper;
+using AwsApi.Contracts.Responses;
 using AwsApi.Services.interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,43 +11,30 @@ namespace AwsApi.Controllers
     {
         private readonly IEc2Service _ec2Service;
         private readonly IRdsService _rdsService;
+        private readonly IMapper _mapper;
 
-        public AwsController(IEc2Service ec2Service, IRdsService rdsService)
+        public AwsController(IEc2Service ec2Service, IRdsService rdsService, IMapper mapper)
         {
             _ec2Service = ec2Service;
             _rdsService = rdsService;
+            _mapper = mapper;
         }
 
         [HttpGet("ec2")]
         public async Task<IActionResult> GetInstances()
         {
             var instances = await _ec2Service.GetInstancesAsync();
-            var result = instances.Select(i => new
-            {
-                InstanceId = i.InstanceId,
-                State = i.State.Name.Value,
-                Type = i.InstanceType.Value,
-                PublicIp = i.PublicIpAddress,
-                LaunchTime = i.LaunchTime
-            });
-
-            return Ok(result);
+            var response = _mapper.Map<IEnumerable<Ec2Response>>(instances);
+            return Ok(response);
         }
 
         [HttpGet("rds")]
         public async Task<IActionResult> GetDbInstances()
         {
             var dbs = await _rdsService.GetDbInstancesAsync();
-            var result = dbs.Select(d => new
-            {
-                d.DBInstanceIdentifier,
-                d.DBInstanceClass,
-                d.Engine,
-                d.DBInstanceStatus,
-                d.Endpoint?.Address
-            });
+            var response = _mapper.Map<IEnumerable<RdsResponse>>(dbs);
 
-            return Ok(result);
+            return Ok(response);
         }
 
         [HttpGet("version")]
