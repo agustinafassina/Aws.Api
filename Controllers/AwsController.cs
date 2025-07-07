@@ -11,13 +11,15 @@ namespace AwsApi.Controllers
     {
         private readonly IEc2Service _ec2Service;
         private readonly IRdsService _rdsService;
+        private readonly ILambdaService _lambdaService;
         private readonly IMapper _mapper;
 
-        public AwsController(IEc2Service ec2Service, IRdsService rdsService, IMapper mapper)
+        public AwsController(IEc2Service ec2Service, IRdsService rdsService, IMapper mapper, ILambdaService lambdaService)
         {
             _ec2Service = ec2Service;
             _rdsService = rdsService;
             _mapper = mapper;
+            _lambdaService = lambdaService;
         }
 
         [HttpGet("ec2")]
@@ -41,6 +43,13 @@ namespace AwsApi.Controllers
         public async Task<IActionResult> GetVersion()
         {
             return Ok("v.1.0.0");
+        }
+
+        [HttpGet("lambdas")]
+        public async Task<IActionResult> GetLambdaFunctions()
+        {
+            var functions = await _lambdaService.ListFunctionsAsync();
+            return Ok(functions);
         }
     }
 }
