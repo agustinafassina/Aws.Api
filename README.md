@@ -9,10 +9,19 @@ Currently, the API retrieves information about EC2 instances and is in the proce
 └─ ./Controllers <br>
 └─ README.md <br>
 
-### How to use this repository?
+### Dotnet build and run
 
 <br>
 From root:
 ```
 dotner run
+```
+
+## Docker Build
+
+```
+docker build -f Dockerfile -t aws-api .
+```
+```
+docker run -d -p 7001:80 -e "ASPNETCORE_ENVIRONMENT=Development" --name aws-api aws-api
 ```
