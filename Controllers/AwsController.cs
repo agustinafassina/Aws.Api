@@ -1,6 +1,7 @@
 using AutoMapper;
 using AwsApi.Contracts.Responses;
 using AwsApi.Services.interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AwsApi.Controllers
@@ -22,6 +23,7 @@ namespace AwsApi.Controllers
             _lambdaService = lambdaService;
         }
 
+        [Authorize(AuthenticationSchemes = "Auth0")]
         [HttpGet("ec2")]
         public async Task<IActionResult> GetInstances()
         {
@@ -30,6 +32,7 @@ namespace AwsApi.Controllers
             return Ok(response);
         }
 
+        [Authorize(AuthenticationSchemes = "Auth0")]
         [HttpGet("rds")]
         public async Task<IActionResult> GetDbInstances()
         {
@@ -39,17 +42,18 @@ namespace AwsApi.Controllers
             return Ok(response);
         }
 
-        [HttpGet("version")]
-        public async Task<IActionResult> GetVersion()
-        {
-            return Ok("v.1.0.0");
-        }
-
+        [Authorize(AuthenticationSchemes = "Auth0")]
         [HttpGet("lambdas")]
         public async Task<IActionResult> GetLambdaFunctions()
         {
             var functions = await _lambdaService.ListFunctionsAsync();
             return Ok(functions);
+        }
+
+        [HttpGet("version")]
+        public async Task<IActionResult> GetVersion()
+        {
+            return Ok("v.1.0.0");
         }
     }
 }
