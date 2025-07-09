@@ -9,6 +9,15 @@ Currently, the API retrieves information about EC2 instances and is in the proce
 └─ ./Controllers <br>
 └─ README.md <br>
 
+### Authorization with Auth0: to validate the authorization, you must set the environment variables in the appsettings files.
+#### Currently the controller has the decoration: [Authorize(AuthenticationSchemes = "Auth0")]
+```
+"Auth0": {
+    "Authority": "https://innovation-engbim.us.auth0.com/",
+    "Audience": "Product"
+}
+```
+
 ### Dotnet build and run
 
 <br>
