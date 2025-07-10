@@ -5,6 +5,8 @@ using AwsApi.Services.interfaces;
 using Amazon.Lambda;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.IdentityModel.Tokens.Jwt;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -34,6 +36,16 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuer = true,
         ValidIssuer = configuration["Auth0:Authority"] ?? Environment.GetEnvironmentVariable("Auth0.Authority")
     };
+})
+.AddJwtBearer("Auth0App2", options =>
+{
+    options.Authority = configuration["Auth0App2:Authority"] ?? Environment.GetEnvironmentVariable("Auth0App2.Authority");
+    options.Audience = configuration["Auth0App2:Audience"] ?? Environment.GetEnvironmentVariable("Auth0App2.Audience");
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidIssuer = configuration["Auth0App2:Authority"] ?? Environment.GetEnvironmentVariable("Auth0App2.Authority")
+    };
 });
 
 builder.Services.AddControllers();
@@ -46,13 +58,11 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
 
 app.MapControllers();
 

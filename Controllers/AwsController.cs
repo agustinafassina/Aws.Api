@@ -1,8 +1,12 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using AutoMapper;
 using AwsApi.Contracts.Responses;
 using AwsApi.Services.interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace AwsApi.Controllers
 {
@@ -42,7 +46,7 @@ namespace AwsApi.Controllers
             return Ok(response);
         }
 
-        [Authorize(AuthenticationSchemes = "Auth0")]
+        [Authorize(AuthenticationSchemes = "Auth0_App_2")]
         [HttpGet("lambdas")]
         public async Task<IActionResult> GetLambdaFunctions()
         {
@@ -55,5 +59,6 @@ namespace AwsApi.Controllers
         {
             return Ok("v.1.0.0");
         }
+
     }
 }
