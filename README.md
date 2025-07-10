@@ -13,8 +13,8 @@ Currently, the API retrieves information about EC2 instances and is in the proce
 #### Currently the controller has the decoration: [Authorize(AuthenticationSchemes = "Auth0")]
 ```
 "Auth0": {
-    "Authority": "https://innovation-engbim.us.auth0.com/",
-    "Audience": "Product"
+    "Authority": "replace",
+    "Audience": "replace"
 }
 ```
 
