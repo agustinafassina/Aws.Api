@@ -3,8 +3,8 @@ This is a .NET 8.0 API designed to interact with Amazon Web Services (AWS) resou
 <br>
 Currently, the API retrieves information about EC2 instances and is in the process of expanding to include other resources such as RDS databases. To fetch data from AWS, you need to have the AWS CLI installed and configured on your machine, as it stores the credentials required for authentication.
 
-### Api diagram
-<img src="api-diagram.png" alt="Logo del proyecto" width="100" height="100">
+### Api diagram:
+<img src="api-diagram.png" alt="Logo del proyecto" width="400" height="450">
 
 ### Structure
 └─ .gitignore <br>
@@ -23,8 +23,6 @@ Currently, the API retrieves information about EC2 instances and is in the proce
 
 ### Dotnet build and run
 
-<br>
-From root:
 ```
 dotner run
 ```
