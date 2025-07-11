@@ -22,6 +22,8 @@ builder.Services.AddAWSService<IAmazonLambda>();
 builder.Services.AddTransient<IEc2Service, Ec2Service>();
 builder.Services.AddTransient<IRdsService, RdsService>();
 builder.Services.AddTransient<ILambdaService, LambdaService>();
+builder.Services.AddTransient<ICostsService, CostsService>();
+builder.Services.AddAWSService<Amazon.CostExplorer.IAmazonCostExplorer>();
 
 builder.Services.AddAuthentication(options =>
 {
