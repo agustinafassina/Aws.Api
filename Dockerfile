@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
 WORKDIR /app
 
 COPY *.sln .
@@ -11,7 +11,7 @@ COPY . .
 WORKDIR /app
 RUN dotnet publish -c Release -o /release
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine
 
 WORKDIR /app
 
