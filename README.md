@@ -8,8 +8,13 @@ Currently, the API retrieves information about EC2 instances and is in the proce
 
 ### Structure
 └─ .gitignore <br>
-└─ ./Services <br>
+└─ ./Configurations <br>
+└─ ./Contracts <br>
 └─ ./Controllers <br>
+└─ ./Mappers <br>
+└─ ./Services <br>
+
+└─ Dockerfile <br>
 └─ README.md <br>
 
 ### Authorization with Auth0: to validate the authorization, you must set the environment variables in the appsettings files.
@@ -28,7 +33,7 @@ dotner run
 ```
 
 ## Docker Build
-
+### Until 7-12-2025 Docker has no vulnerabilities.
 ```
 docker build -f Dockerfile -t aws-api .
 ```
