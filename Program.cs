@@ -31,22 +31,22 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer("Auth0", options =>
 {
-    options.Authority = configuration["Auth0:Authority"] ?? Environment.GetEnvironmentVariable("Auth0.Authority");
+    options.Authority = configuration["Auth0:Issuer"] ?? Environment.GetEnvironmentVariable("Auth0.Issuer");
     options.Audience = configuration["Auth0:Audience"] ?? Environment.GetEnvironmentVariable("Auth0.Audience");
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
-        ValidIssuer = configuration["Auth0:Authority"] ?? Environment.GetEnvironmentVariable("Auth0.Authority")
+        ValidIssuer = configuration["Auth0:Issuer"] ?? Environment.GetEnvironmentVariable("Auth0.Issuer")
     };
 })
 .AddJwtBearer("Auth0App2", options =>
 {
-    options.Authority = configuration["Auth0App2:Authority"] ?? Environment.GetEnvironmentVariable("Auth0App2.Authority");
+    options.Authority = configuration["Auth0App2:Issuer"] ?? Environment.GetEnvironmentVariable("Auth0App2.Issuer");
     options.Audience = configuration["Auth0App2:Audience"] ?? Environment.GetEnvironmentVariable("Auth0App2.Audience");
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
-        ValidIssuer = configuration["Auth0App2:Authority"] ?? Environment.GetEnvironmentVariable("Auth0App2.Authority")
+        ValidIssuer = configuration["Auth0App2:Issuer"] ?? Environment.GetEnvironmentVariable("Auth0App2.Issuer")
     };
 });
 
