@@ -49,7 +49,7 @@ namespace AwsApi.Controllers
             return Ok(response);
         }
 
-        [Authorize(AuthenticationSchemes = "Auth0_App_2")]
+        [Authorize(AuthenticationSchemes = "Auth0App2")]
         [HttpGet("lambdas")]
         public async Task<IActionResult> GetLambdaFunctions()
         {
