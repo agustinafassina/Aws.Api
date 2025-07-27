@@ -34,8 +34,8 @@ namespace AwsApi.Controllers
         [HttpGet("ec2")]
         public async Task<IActionResult> GetInstances()
         {
-            var instances = await _ec2Service.GetInstancesAsync();
-            var response = _mapper.Map<IEnumerable<Ec2Response>>(instances);
+            List<Amazon.EC2.Model.Instance> instances = await _ec2Service.GetInstancesAsync();
+            IEnumerable<Ec2Response> response = _mapper.Map<IEnumerable<Ec2Response>>(instances);
             return Ok(response);
         }
 
@@ -43,8 +43,8 @@ namespace AwsApi.Controllers
         [HttpGet("rds")]
         public async Task<IActionResult> GetDbInstances()
         {
-            var dbs = await _rdsService.GetDbInstancesAsync();
-            var response = _mapper.Map<IEnumerable<RdsResponse>>(dbs);
+            List<Amazon.RDS.Model.DBInstance> dbs = await _rdsService.GetDbInstancesAsync();
+            IEnumerable<RdsResponse> response = _mapper.Map<IEnumerable<RdsResponse>>(dbs);
 
             return Ok(response);
         }
@@ -53,7 +53,7 @@ namespace AwsApi.Controllers
         [HttpGet("lambdas")]
         public async Task<IActionResult> GetLambdaFunctions()
         {
-            var functions = await _lambdaService.ListFunctionsAsync();
+            List<string> functions = await _lambdaService.ListFunctionsAsync();
             return Ok(functions);
         }
 
