@@ -1,0 +1,35 @@
+name: $(SourceBranchName)_$(Build.SourceVersion)
+
+trigger:
+ branches:
+    include:
+      - develop
+
+pr: none
+
+pool:
+  vmImage: 'ubuntu-22.04'
+
+steps:
+- script: |
+    aws ecr get-login-password --region $(AWS_REGION) | docker login --username AWS --password-stdin $(AWS_ACCOUNTID).dkr.ecr.$(AWS_REGION).amazonaws.com
+  displayName: 'Login to AWS'
+  env:
+    AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+    AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+
+- task: Bash@3
+  displayName: Build app container image
+  inputs:
+      targetType: 'inline'
+      script: |
+        docker build -t $(DOCKER_REPOSITORY_NAME) .
+
+- task: Bash@3
+  displayName: Push app container image to Elastic Container Registry
+  inputs:
+    targetType: 'inline'
+    script: |
+      echo "GIT COMMIT IS: $(Build.SourceVersion)"
+      docker tag $(DOCKER_REPOSITORY_NAME):latest $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com/$(DOCKER_REPOSITORY_NAME):$(Build.SourceVersion)
+      docker push $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com/$(DOCKER_REPOSITORY_NAME):$(Build.SourceVersion)
