@@ -57,6 +57,7 @@ namespace AwsApi.Controllers
             return Ok(functions);
         }
 
+        [Authorize(AuthenticationSchemes = "Auth0App2")]
         [HttpGet("costs")]
         public async Task<IActionResult> GetCostByProject([FromQuery] string projectTag)
         {
@@ -71,6 +72,17 @@ namespace AwsApi.Controllers
         public async Task<IActionResult> GetVersion()
         {
             return Ok("v.1.0.0");
+        }
+
+        [Authorize(AuthenticationSchemes = "Auth0App2")]
+        [HttpGet("costs-report")]
+        public async Task<IActionResult> GetReportByTag([FromQuery] string projectTag)
+        {
+            if (string.IsNullOrEmpty(projectTag))
+                return BadRequest("The parameter 'projectTag' is required.");
+
+            GetCostAndUsageResponse costs = await _costsService.GetCostsReport(projectTag);
+            return Ok(costs);
         }
     }
 }
