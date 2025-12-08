@@ -6,5 +6,6 @@ namespace AwsApi.Services.interfaces
     public interface ICostsService
     {
         Task<GetCostAndUsageResponse> GetCostsByTagAsync(string tagValue);
+        Task<GetCostAndUsageResponse> GetCostsReport(string tagValue);
     }
 }
