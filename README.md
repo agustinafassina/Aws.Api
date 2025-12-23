@@ -17,6 +17,9 @@ Currently, the API retrieves information about EC2 instances and is in the proce
 └─ Dockerfile <br>
 └─ README.md <br>
 
+### Controllers
+- Aws
+
 ### 🔐Authorization with Auth0: to validate the authorization, you must set the environment variables in the appsettings files.
 #### 🔑Currently the controller has the decoration: [Authorize(AuthenticationSchemes = "Auth0")]
 ```
