@@ -5,7 +5,6 @@ using AwsApi.Services.Interfaces;
 using Amazon.Lambda;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -60,11 +59,9 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// Swagger available in all environments
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.MapControllers();
 

@@ -1,6 +1,4 @@
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using Amazon.CostExplorer.Model;
 using AutoMapper;
 using AwsApi.Contracts.Responses;
