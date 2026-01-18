@@ -2,6 +2,7 @@ using System.Text;
 using Amazon.CostExplorer;
 using Amazon.CostExplorer.Model;
 using AwsApi.Services.Interfaces;
+using Microsoft.Extensions.Configuration;
 
 namespace AwsApi.Services
 {
@@ -9,11 +10,13 @@ namespace AwsApi.Services
     {
         private readonly IAmazonCostExplorer _costExplorer;
         private readonly ILogger<CostsService> _logger;
+        private readonly IConfiguration _configuration;
 
-        public CostsService(IAmazonCostExplorer costExplorer, ILogger<CostsService> logger)
+        public CostsService(IAmazonCostExplorer costExplorer, ILogger<CostsService> logger, IConfiguration configuration)
         {
             _costExplorer = costExplorer;
             _logger = logger;
+            _configuration = configuration;
         }
 
         public async Task<GetCostAndUsageResponse> GetCostsByTagAsync(string tagValue)
@@ -21,7 +24,7 @@ namespace AwsApi.Services
             try
             {
                 _logger.LogInformation("Getting costs for project tag: {TagValue}", tagValue);
-                string projectValueTag = "Project";
+                string projectValueTag = _configuration["Aws:ProjectTagKey"] ?? "Project";
 
                 var (startDate, endDate) = GetCurrentMonthDates();
 
