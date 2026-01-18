@@ -4,7 +4,7 @@ using System.Text;
 using Amazon.CostExplorer.Model;
 using AutoMapper;
 using AwsApi.Contracts.Responses;
-using AwsApi.Services.interfaces;
+using AwsApi.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -71,12 +71,12 @@ namespace AwsApi.Controllers
 
         [Authorize(AuthenticationSchemes = "Auth0App2")]
         [HttpGet("lambdas")]
-        public async Task<IActionResult> GetLambdaFunctions()
+        public IActionResult GetLambdaFunctions()
         {
             try
             {
                 _logger.LogInformation("Getting Lambda functions");
-                List<string> functions = await _lambdaService.ListFunctionsAsync();
+                List<string> functions = _lambdaService.ListFunctionsAsync().Result;
                 return Ok(functions);
             }
             catch (Exception ex)

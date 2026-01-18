@@ -1,7 +1,7 @@
 using AwsApi.Services;
 using Amazon.EC2;
 using Amazon.RDS;
-using AwsApi.Services.interfaces;
+using AwsApi.Services.Interfaces;
 using Amazon.Lambda;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;

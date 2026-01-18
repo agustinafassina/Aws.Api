@@ -2,7 +2,7 @@ using System.Text;
 using System.Text.Json;
 using Amazon.CostExplorer;
 using Amazon.CostExplorer.Model;
-using AwsApi.Services.interfaces;
+using AwsApi.Services.Interfaces;
 
 namespace AwsApi.Services
 {
@@ -22,6 +22,7 @@ namespace AwsApi.Services
             try
             {
                 _logger.LogInformation("Getting costs for project tag: {TagValue}", tagValue);
+                string projectValueTag = "Project";
 
                 var (startDate, endDate) = GetCurrentMonthDates();
 
@@ -52,7 +53,7 @@ namespace AwsApi.Services
                 {
                     Tags = new TagValues
                     {
-                        Key = "Project",
+                        Key = projectValueTag,
                         Values = projects
                     }
                 };
@@ -109,7 +110,7 @@ namespace AwsApi.Services
 
                 try
                 {
-                    GenerateHtml(tagValue, costosPorServicio, totalCost, startDate, endDate);
+                    //GenerateHtml(tagValue, costosPorServicio, totalCost, startDate, endDate);
                     _logger.LogInformation("HTML report generated successfully for project tag: {TagValue}", tagValue);
                 }
                 catch (Exception ex)

@@ -1,6 +1,6 @@
 using Amazon.RDS;
 using Amazon.RDS.Model;
-using AwsApi.Services.interfaces;
+using AwsApi.Services.Interfaces;
 
 namespace AwsApi.Services
 {

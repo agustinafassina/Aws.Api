@@ -1,7 +1,7 @@
 using Amazon.CostExplorer.Model;
 using AwsApi.Services.Dto;
 
-namespace AwsApi.Services.interfaces
+namespace AwsApi.Services.Interfaces
 {
     public interface ICostsService
     {

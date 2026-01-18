@@ -1,6 +1,6 @@
 using Amazon.EC2;
 using Amazon.EC2.Model;
-using AwsApi.Services.interfaces;
+using AwsApi.Services.Interfaces;
 
 namespace AwsApi.Services
 {

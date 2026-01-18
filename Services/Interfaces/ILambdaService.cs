@@ -1,4 +1,4 @@
-namespace AwsApi.Services.interfaces
+namespace AwsApi.Services.Interfaces
 {
     public interface ILambdaService
     {

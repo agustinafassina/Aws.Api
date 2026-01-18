@@ -1,6 +1,6 @@
 using Amazon.Lambda;
 using Amazon.Lambda.Model;
-using AwsApi.Services.interfaces;
+using AwsApi.Services.Interfaces;
 
 namespace AwsApi.Services
 {
