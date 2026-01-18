@@ -7,31 +7,44 @@ namespace AwsApi.Services
     public class LambdaService : ILambdaService
     {
         private readonly IAmazonLambda _lambdaClient;
+        private readonly ILogger<LambdaService> _logger;
 
-        public LambdaService(IAmazonLambda lambdaClient)
+        public LambdaService(IAmazonLambda lambdaClient, ILogger<LambdaService> logger)
         {
             _lambdaClient = lambdaClient;
+            _logger = logger;
         }
 
         public async Task<List<string>> ListFunctionsAsync()
         {
-            var functions = new List<string>();
-            string marker = null;
-
-            do
+            try
             {
-                var request = new ListFunctionsRequest { Marker = marker };
-                var response = await _lambdaClient.ListFunctionsAsync(request);
+                _logger.LogInformation("Retrieving Lambda functions");
 
-                foreach (var function in response.Functions)
+                var functions = new List<string>();
+                string marker = null;
+
+                do
                 {
-                    functions.Add(function.FunctionName);
-                }
-                marker = response.NextMarker;
+                    var request = new ListFunctionsRequest { Marker = marker };
+                    var response = await _lambdaClient.ListFunctionsAsync(request);
 
-            } while (!string.IsNullOrEmpty(marker));
+                    foreach (var function in response.Functions)
+                    {
+                        functions.Add(function.FunctionName);
+                    }
+                    marker = response.NextMarker;
 
-            return functions;
+                } while (!string.IsNullOrEmpty(marker));
+
+                _logger.LogInformation("Successfully retrieved {Count} Lambda functions", functions.Count);
+                return functions;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving Lambda functions. Error: {ErrorMessage}", ex.Message);
+                throw;
+            }
         }
     }
 }

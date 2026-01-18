@@ -9,87 +9,128 @@ namespace AwsApi.Services
     public class CostsService : ICostsService
     {
         private readonly IAmazonCostExplorer _costExplorer;
+        private readonly ILogger<CostsService> _logger;
 
-        public CostsService(IAmazonCostExplorer costExplorer)
+        public CostsService(IAmazonCostExplorer costExplorer, ILogger<CostsService> logger)
         {
             _costExplorer = costExplorer;
+            _logger = logger;
         }
 
         public async Task<GetCostAndUsageResponse> GetCostsByTagAsync(string tagValue)
         {
-            var today = DateTime.UtcNow;
-            var startOfMonth = new DateTime(today.Year, today.Month, 1);
-            var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
-
-            List<string> projects = new List<string>{
-                tagValue
-            };
-
-            var request = new GetCostAndUsageRequest
+            try
             {
-                TimePeriod = new DateInterval
+                _logger.LogInformation("Getting costs for project tag: {TagValue}", tagValue);
+
+                var today = DateTime.UtcNow;
+                var startOfMonth = new DateTime(today.Year, today.Month, 1);
+                var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
+
+                List<string> projects = new List<string>{
+                    tagValue
+                };
+
+                var request = new GetCostAndUsageRequest
                 {
-                    Start = startOfMonth.ToString("yyyy-MM-dd"),
-                    End = endOfMonth.ToString("yyyy-MM-dd")
-                },
-                Granularity = Granularity.MONTHLY,
-                Metrics = new List<string> { "BlendedCost" },
-                GroupBy = new List<GroupDefinition>
-                {
-                    new GroupDefinition
+                    TimePeriod = new DateInterval
                     {
-                        Key = "SERVICE",
-                        Type = GroupDefinitionType.DIMENSION
+                        Start = startOfMonth.ToString("yyyy-MM-dd"),
+                        End = endOfMonth.ToString("yyyy-MM-dd")
+                    },
+                    Granularity = Granularity.MONTHLY,
+                    Metrics = new List<string> { "BlendedCost" },
+                    GroupBy = new List<GroupDefinition>
+                    {
+                        new GroupDefinition
+                        {
+                            Key = "SERVICE",
+                            Type = GroupDefinitionType.DIMENSION
+                        }
                     }
-                }
-            };
+                };
 
-            request.Filter = new Expression
-            {
-                Tags = new TagValues
+                request.Filter = new Expression
                 {
-                    Key = "Project",
-                    Values = projects
-                }
-            };
+                    Tags = new TagValues
+                    {
+                        Key = "Project",
+                        Values = projects
+                    }
+                };
 
-            GetCostAndUsageResponse response = await _costExplorer.GetCostAndUsageAsync(request);
-            return response;
+                GetCostAndUsageResponse response = await _costExplorer.GetCostAndUsageAsync(request);
+                _logger.LogInformation("Successfully retrieved costs for project tag: {TagValue}", tagValue);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting costs for project tag: {TagValue}. Error: {ErrorMessage}", tagValue, ex.Message);
+                throw;
+            }
         }
 
         public async Task<GetCostAndUsageResponse> GetCostsReport(string tagValue)
         {
-            GetCostAndUsageResponse response = await GetCostsByTagAsync(tagValue);
-            var costosPorServicio = new Dictionary<string, decimal>();
-            decimal totalCost = 0;
-
-            foreach (var resultado in response.ResultsByTime)
+            try
             {
-                foreach (var grupo in resultado.Groups)
-                {
-                    string servicio = grupo.Keys[0];
-                    decimal costo = decimal.Parse(grupo.Metrics["BlendedCost"].Amount);
-                    totalCost += costo;
+                _logger.LogInformation("Generating cost report for project tag: {TagValue}", tagValue);
 
-                    if (costosPorServicio.ContainsKey(servicio))
+                GetCostAndUsageResponse response = await GetCostsByTagAsync(tagValue);
+                var costosPorServicio = new Dictionary<string, decimal>();
+                decimal totalCost = 0;
+
+                foreach (var resultado in response.ResultsByTime)
+                {
+                    foreach (var grupo in resultado.Groups)
                     {
-                        costosPorServicio[servicio] += costo;
-                    }
-                    else
-                    {
-                        costosPorServicio[servicio] = costo;
+                        try
+                        {
+                            string servicio = grupo.Keys[0];
+                            decimal costo = decimal.Parse(grupo.Metrics["BlendedCost"].Amount);
+                            totalCost += costo;
+
+                            if (costosPorServicio.ContainsKey(servicio))
+                            {
+                                costosPorServicio[servicio] += costo;
+                            }
+                            else
+                            {
+                                costosPorServicio[servicio] = costo;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogWarning(ex, "Error processing cost group for service. Continuing with next group.");
+                            continue;
+                        }
                     }
                 }
+
+                var today = DateTime.UtcNow;
+                var startOfMonth = new DateTime(today.Year, today.Month, 1);
+                var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
+                string startDate = startOfMonth.ToString("yyyy-MM-dd");
+                string endDate = endOfMonth.ToString("yyyy-MM-dd");
+
+                try
+                {
+                    GenerateHtml(tagValue, costosPorServicio, totalCost, startDate, endDate);
+                    _logger.LogInformation("HTML report generated successfully for project tag: {TagValue}", tagValue);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Error generating HTML report for project tag: {TagValue}. Continuing without HTML.", tagValue);
+                }
+
+                _logger.LogInformation("Cost report generated successfully for project tag: {TagValue}. Total cost: {TotalCost}", tagValue, totalCost);
+                return response;
             }
-
-            var today = DateTime.UtcNow;
-            var startOfMonth = new DateTime(today.Year, today.Month, 1);
-            var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
-            string startDate = startOfMonth.ToString("yyyy-MM-dd");
-            string endDate = endOfMonth.ToString("yyyy-MM-dd");
-
-            GenerateHtml(tagValue, costosPorServicio, totalCost, startDate, endDate);
-            return response;
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error generating cost report for project tag: {TagValue}. Error: {ErrorMessage}", tagValue, ex.Message);
+                throw;
+            }
         }
 
         private static string GenerateHtml(string tagValue, Dictionary<string, decimal> costosPorServicio, decimal totalCost, string startDate, string endDate)
@@ -125,6 +166,46 @@ namespace AwsApi.Services
             File.WriteAllText($"{fileName}", sb.ToString());
             Console.WriteLine($"Report: {fileName}");
             return fileName;
+        }
+
+        public async Task<GetCostAndUsageResponse> GetAllCostsAsync()
+        {
+            try
+            {
+                _logger.LogInformation("Getting all costs for current month");
+
+                var today = DateTime.UtcNow;
+                var startOfMonth = new DateTime(today.Year, today.Month, 1);
+                var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
+
+                var request = new GetCostAndUsageRequest
+                {
+                    TimePeriod = new DateInterval
+                    {
+                        Start = startOfMonth.ToString("yyyy-MM-dd"),
+                        End = endOfMonth.ToString("yyyy-MM-dd")
+                    },
+                    Granularity = Granularity.MONTHLY,
+                    Metrics = new List<string> { "BlendedCost" },
+                    GroupBy = new List<GroupDefinition>
+                    {
+                        new GroupDefinition
+                        {
+                            Key = "SERVICE",
+                            Type = GroupDefinitionType.DIMENSION
+                        }
+                    }
+                };
+
+                GetCostAndUsageResponse response = await _costExplorer.GetCostAndUsageAsync(request);
+                _logger.LogInformation("Successfully retrieved all costs for current month");
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting all costs. Error: {ErrorMessage}", ex.Message);
+                throw;
+            }
         }
     }
 }
