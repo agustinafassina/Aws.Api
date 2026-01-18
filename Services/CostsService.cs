@@ -23,9 +23,7 @@ namespace AwsApi.Services
             {
                 _logger.LogInformation("Getting costs for project tag: {TagValue}", tagValue);
 
-                var today = DateTime.UtcNow;
-                var startOfMonth = new DateTime(today.Year, today.Month, 1);
-                var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
+                var (startDate, endDate) = GetCurrentMonthDates();
 
                 List<string> projects = new List<string>{
                     tagValue
@@ -35,8 +33,8 @@ namespace AwsApi.Services
                 {
                     TimePeriod = new DateInterval
                     {
-                        Start = startOfMonth.ToString("yyyy-MM-dd"),
-                        End = endOfMonth.ToString("yyyy-MM-dd")
+                        Start = startDate,
+                        End = endDate
                     },
                     Granularity = Granularity.MONTHLY,
                     Metrics = new List<string> { "BlendedCost" },
@@ -107,11 +105,7 @@ namespace AwsApi.Services
                     }
                 }
 
-                var today = DateTime.UtcNow;
-                var startOfMonth = new DateTime(today.Year, today.Month, 1);
-                var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
-                string startDate = startOfMonth.ToString("yyyy-MM-dd");
-                string endDate = endOfMonth.ToString("yyyy-MM-dd");
+                var (startDate, endDate) = GetCurrentMonthDates();
 
                 try
                 {
@@ -174,16 +168,14 @@ namespace AwsApi.Services
             {
                 _logger.LogInformation("Getting all costs for current month");
 
-                var today = DateTime.UtcNow;
-                var startOfMonth = new DateTime(today.Year, today.Month, 1);
-                var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
+                var (startDate, endDate) = GetCurrentMonthDates();
 
                 var request = new GetCostAndUsageRequest
                 {
                     TimePeriod = new DateInterval
                     {
-                        Start = startOfMonth.ToString("yyyy-MM-dd"),
-                        End = endOfMonth.ToString("yyyy-MM-dd")
+                        Start = startDate,
+                        End = endDate
                     },
                     Granularity = Granularity.MONTHLY,
                     Metrics = new List<string> { "BlendedCost" },
@@ -206,6 +198,14 @@ namespace AwsApi.Services
                 _logger.LogError(ex, "Error getting all costs. Error: {ErrorMessage}", ex.Message);
                 throw;
             }
+        }
+
+        private (string startDate, string endDate) GetCurrentMonthDates()
+        {
+            var today = DateTime.UtcNow;
+            var startOfMonth = new DateTime(today.Year, today.Month, 1);
+            var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
+            return (startOfMonth.ToString("yyyy-MM-dd"), endOfMonth.ToString("yyyy-MM-dd"));
         }
     }
 }
