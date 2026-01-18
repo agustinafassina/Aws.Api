@@ -21,10 +21,26 @@ namespace AwsApi.Services
             {
                 _logger.LogInformation("Retrieving RDS instances");
 
-                var response = await _client.DescribeDBInstancesAsync();
-                
-                _logger.LogInformation("Successfully retrieved {Count} RDS instances", response.DBInstances.Count);
-                return response.DBInstances;
+                var instances = new List<DBInstance>();
+                string marker = null;
+
+                do
+                {
+                    var request = new DescribeDBInstancesRequest();
+                    if (!string.IsNullOrEmpty(marker))
+                    {
+                        request.Marker = marker;
+                    }
+
+                    var response = await _client.DescribeDBInstancesAsync(request);
+                    instances.AddRange(response.DBInstances);
+
+                    marker = response.Marker;
+
+                } while (!string.IsNullOrEmpty(marker));
+
+                _logger.LogInformation("Successfully retrieved {Count} RDS instances", instances.Count);
+                return instances;
             }
             catch (Exception ex)
             {

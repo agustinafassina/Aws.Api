@@ -21,13 +21,27 @@ namespace AwsApi.Services
             {
                 _logger.LogInformation("Retrieving EC2 instances");
 
-                var response = await _client.DescribeInstancesAsync();
                 var instances = new List<Instance>();
+                string nextToken = null;
 
-                foreach (var reservation in response.Reservations)
+                do
                 {
-                    instances.AddRange(reservation.Instances);
-                }
+                    var request = new DescribeInstancesRequest();
+                    if (!string.IsNullOrEmpty(nextToken))
+                    {
+                        request.NextToken = nextToken;
+                    }
+
+                    var response = await _client.DescribeInstancesAsync(request);
+
+                    foreach (var reservation in response.Reservations)
+                    {
+                        instances.AddRange(reservation.Instances);
+                    }
+
+                    nextToken = response.NextToken;
+
+                } while (!string.IsNullOrEmpty(nextToken));
 
                 _logger.LogInformation("Successfully retrieved {Count} EC2 instances", instances.Count);
                 return instances;

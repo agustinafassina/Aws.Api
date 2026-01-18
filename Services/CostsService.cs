@@ -81,23 +81,23 @@ namespace AwsApi.Services
                 var costsByService = new Dictionary<string, decimal>();
                 decimal totalCost = 0;
 
-                foreach (var resultado in response.ResultsByTime)
+                foreach (var result in response.ResultsByTime)
                 {
-                    foreach (var grupo in resultado.Groups)
+                    foreach (var group in result.Groups)
                     {
                         try
                         {
-                            string servicio = grupo.Keys[0];
-                            decimal costo = decimal.Parse(grupo.Metrics["BlendedCost"].Amount);
-                            totalCost += costo;
+                            string service = group.Keys[0];
+                            decimal cost = decimal.Parse(group.Metrics["BlendedCost"].Amount);
+                            totalCost += cost;
 
-                            if (costsByService.ContainsKey(servicio))
+                            if (costsByService.ContainsKey(service))
                             {
-                                costsByService[servicio] += costo;
+                                costsByService[service] += cost;
                             }
                             else
                             {
-                                costsByService[servicio] = costo;
+                                costsByService[service] = cost;
                             }
                         }
                         catch (Exception ex)
