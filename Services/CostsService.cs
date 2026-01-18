@@ -78,7 +78,7 @@ namespace AwsApi.Services
                 _logger.LogInformation("Generating cost report for project tag: {TagValue}", tagValue);
 
                 GetCostAndUsageResponse response = await GetCostsByTagAsync(tagValue);
-                var costosPorServicio = new Dictionary<string, decimal>();
+                var costsByService = new Dictionary<string, decimal>();
                 decimal totalCost = 0;
 
                 foreach (var resultado in response.ResultsByTime)
@@ -91,13 +91,13 @@ namespace AwsApi.Services
                             decimal costo = decimal.Parse(grupo.Metrics["BlendedCost"].Amount);
                             totalCost += costo;
 
-                            if (costosPorServicio.ContainsKey(servicio))
+                            if (costsByService.ContainsKey(servicio))
                             {
-                                costosPorServicio[servicio] += costo;
+                                costsByService[servicio] += costo;
                             }
                             else
                             {
-                                costosPorServicio[servicio] = costo;
+                                costsByService[servicio] = costo;
                             }
                         }
                         catch (Exception ex)
@@ -112,7 +112,6 @@ namespace AwsApi.Services
 
                 try
                 {
-                    //GenerateHtml(tagValue, costosPorServicio, totalCost, startDate, endDate);
                     _logger.LogInformation("HTML report generated successfully for project tag: {TagValue}", tagValue);
                 }
                 catch (Exception ex)
@@ -128,41 +127,6 @@ namespace AwsApi.Services
                 _logger.LogError(ex, "Error generating cost report for project tag: {TagValue}. Error: {ErrorMessage}", tagValue, ex.Message);
                 throw;
             }
-        }
-
-        private static string GenerateHtml(string tagValue, Dictionary<string, decimal> costosPorServicio, decimal totalCost, string startDate, string endDate)
-        {
-            string fileName = "cost_report.html";
-
-            var sb = new StringBuilder();
-            sb.AppendLine("<html>");
-            sb.AppendLine("<head>");
-            sb.AppendLine("<title>AWS Cost Report</title>");
-            sb.AppendLine("<style>");
-            sb.AppendLine("table { border-collapse: collapse; width: 100%; }");
-            sb.AppendLine("th, td { border: 1px solid #7c3838ff; padding: 8px; }");
-            sb.AppendLine("th { background-color: #7c3838ff; color: white; }");
-            sb.AppendLine("</style>");
-            sb.AppendLine("</head>");
-            sb.AppendLine("<body>");
-            sb.AppendLine($"<h3>Project: {tagValue}</h3>");
-            sb.AppendLine($"<h2>Cost report ({startDate} - {endDate})</h2>");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr><th>Service</th><th>Cost (USD)</th></tr>");
-
-            foreach (var servicio in costosPorServicio)
-            {
-                sb.AppendLine($"<tr><td>{servicio.Key}</td><td>{servicio.Value:F2}</td></tr>");
-            }
-
-            sb.AppendLine($"<tr><td><strong>Total</strong></td><td><strong>{totalCost:F2} USD</strong></td></tr>");
-            sb.AppendLine("</table>");
-            sb.AppendLine("</body>");
-            sb.AppendLine("</html>");
-
-            File.WriteAllText($"{fileName}", sb.ToString());
-            Console.WriteLine($"Report: {fileName}");
-            return fileName;
         }
 
         public async Task<GetCostAndUsageResponse> GetAllCostsAsync()

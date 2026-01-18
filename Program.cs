@@ -30,25 +30,34 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer("Auth0", options =>
 {
-    options.Authority = configuration["Auth0:Issuer"] ?? Environment.GetEnvironmentVariable("Auth0.Issuer");
+    options.Authority = configuration["Auth0:Authority"] ?? Environment.GetEnvironmentVariable("Auth0.Authority");
     options.Audience = configuration["Auth0:Audience"] ?? Environment.GetEnvironmentVariable("Auth0.Audience");
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
-        ValidIssuer = configuration["Auth0:Issuer"] ?? Environment.GetEnvironmentVariable("Auth0.Issuer")
+        ValidIssuer = configuration["Auth0:Authority"] ?? Environment.GetEnvironmentVariable("Auth0.Authority")
     };
 })
 .AddJwtBearer("Auth0App2", options =>
 {
-    options.Authority = configuration["Auth0App2:Issuer"] ?? Environment.GetEnvironmentVariable("Auth0App2.Issuer");
+    options.Authority = configuration["Auth0App2:Authority"] ?? Environment.GetEnvironmentVariable("Auth0App2.Authority");
     options.Audience = configuration["Auth0App2:Audience"] ?? Environment.GetEnvironmentVariable("Auth0App2.Audience");
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
-        ValidIssuer = configuration["Auth0App2:Issuer"] ?? Environment.GetEnvironmentVariable("Auth0App2.Issuer")
+        ValidIssuer = configuration["Auth0App2:Authority"] ?? Environment.GetEnvironmentVariable("Auth0App2.Authority")
     };
 });
 
+builder.Services.AddCors(options => {
+    options.AddPolicy("AllowSpecificOrigin", policy => {
+        policy.WithOrigins("https://front.com")
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
+builder.Services.AddHealthChecks();
 builder.Services.AddControllers();
 
 var app = builder.Build();
@@ -59,10 +68,13 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseCors("AllowSpecificOrigin");
+
 // Swagger available in all environments
 app.UseSwagger();
 app.UseSwaggerUI();
 
+app.MapHealthChecks("/health");
 app.MapControllers();
 
 app.Run();
