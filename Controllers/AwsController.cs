@@ -1,6 +1,6 @@
 using Amazon.CostExplorer.Model;
-using AutoMapper;
 using AwsApi.Contracts.Responses;
+using AwsApi.Mappers;
 using AwsApi.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,14 +16,12 @@ namespace AwsApi.Controllers
         private readonly IRdsService _rdsService;
         private readonly ILambdaService _lambdaService;
         private readonly ICostsService _costsService;
-        private readonly IMapper _mapper;
         private readonly ILogger<AwsController> _logger;
 
-        public AwsController(IEc2Service ec2Service, IRdsService rdsService, IMapper mapper, ILambdaService lambdaService, ICostsService costsService, ILogger<AwsController> logger)
+        public AwsController(IEc2Service ec2Service, IRdsService rdsService, ILambdaService lambdaService, ICostsService costsService, ILogger<AwsController> logger)
         {
             _ec2Service = ec2Service;
             _rdsService = rdsService;
-            _mapper = mapper;
             _lambdaService = lambdaService;
             _costsService = costsService;
             _logger = logger;
@@ -37,7 +35,7 @@ namespace AwsApi.Controllers
             {
                 _logger.LogInformation("Getting EC2 instances");
                 List<Amazon.EC2.Model.Instance> instances = await _ec2Service.GetInstancesAsync();
-                IEnumerable<Ec2Response> response = _mapper.Map<IEnumerable<Ec2Response>>(instances);
+                IEnumerable<Ec2Response> response = instances.Select(i => i.ToResponse()).ToList();
                 return Ok(response);
             }
             catch (Exception ex)
@@ -55,7 +53,7 @@ namespace AwsApi.Controllers
             {
                 _logger.LogInformation("Getting RDS instances");
                 List<Amazon.RDS.Model.DBInstance> dbs = await _rdsService.GetDbInstancesAsync();
-                IEnumerable<RdsResponse> response = _mapper.Map<IEnumerable<RdsResponse>>(dbs);
+                IEnumerable<RdsResponse> response = dbs.Select(d => d.ToResponse()).ToList();
 
                 return Ok(response);
             }
