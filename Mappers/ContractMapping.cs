@@ -1,16 +1,21 @@
-﻿using Amazon.EC2.Model;
+using Amazon.EC2.Model;
 using Amazon.RDS.Model;
-using AutoMapper;
 using AwsApi.Contracts.Responses;
 
 namespace AwsApi.Mappers
 {
-    public class ContractMapping : Profile
+    public static class ContractMapping
     {
-        public ContractMapping()
+        public static Ec2Response ToResponse(this Instance instance) => new()
         {
-            CreateMap<Instance, Ec2Response>();
-            CreateMap<DBInstance, RdsResponse>();
-        }
+            InstanceId = instance.InstanceId,
+            State = instance.State?.Name?.Value
+        };
+
+        public static RdsResponse ToResponse(this DBInstance dbInstance) => new()
+        {
+            DBInstanceIdentifier = dbInstance.DBInstanceIdentifier,
+            DBInstanceArn = dbInstance.DBInstanceArn
+        };
     }
 }
